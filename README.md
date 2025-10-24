@@ -24,16 +24,25 @@ Este projeto implementa uma API RESTful para simulação de um sistema de emiss�
 
 1. Clone o repositório:
 ```bash
-git clone [URL_DO_REPOSITÓRIO]
+git clone https://github.com/JeanCarlos88/HST_card_api.git
 cd HST_card_api
 ```
 
-2. Instale as dependências:
+2. Instale as dependências do projeto:
 ```bash
 pip install -r requirements.txt
 ```
 
+3. Instale as dependências dos testes (opcional):
+```bash
+cd tests/robot
+pip install -r requirements.txt
+cd ../..
+```
+
 ## Como Executar
+
+### API
 
 1. Inicie o servidor:
 ```bash
@@ -41,8 +50,38 @@ uvicorn app.main:app --reload
 ```
 
 2. Acesse a documentação:
-- Swagger UI: http://127.0.0.1:8000/docs
-- ReDoc: http://127.0.0.1:8000/redoc
+- Swagger UI: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- ReDoc: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+### Testes Automatizados
+
+1. Certifique-se que a API está rodando (passo anterior)
+
+2. Execute todos os testes:
+```bash
+cd tests/robot
+robot -L TRACE .
+```
+
+3. Execute testes específicos por tags:
+```bash
+# Executar apenas testes de emissão
+robot -L TRACE -i EmissaoCartao .
+
+# Executar apenas testes de tokenização
+robot -L TRACE -i Tokenizacao .
+
+# Executar apenas testes de autenticação
+robot -L TRACE -i Autenticacao .
+
+# Executar apenas testes de health check
+robot -L TRACE -i Health .
+```
+
+Os resultados dos testes serão gerados em:
+- `log.html`: Log detalhado da execução
+- `report.html`: Relatório resumido dos testes
+- `output.xml`: Dados brutos para integração contínua
 
 ## Estrutura do Projeto
 
@@ -54,6 +93,16 @@ HST_card_api/
 │   ├── main.py          # Aplicação FastAPI e endpoints
 │   ├── models.py        # Modelos Pydantic
 │   └── services.py      # Lógica de negócios
+│
+├── tests/
+│   └── robot/           # Testes automatizados com Robot Framework
+│       ├── resources/
+│       │   └── CardApiPageObject.resource  # Page Object da API
+│       ├── autenticacao_bdd.robot          # Teste de autenticação
+│       ├── emissao_cartao_bdd.robot       # Teste de emissão
+│       ├── health_bdd.robot               # Teste de health check
+│       ├── tokenizacao_bdd.robot          # Teste de tokenização
+│       └── requirements.txt               # Dependências dos testes
 │
 ├── docs/
 │   └── documentacao.md  # Documentação detalhada em português
