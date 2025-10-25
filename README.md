@@ -8,6 +8,7 @@ Este projeto implementa uma API RESTful para simulação de um sistema de emiss�
 - Emissão de cartões de crédito e débito
 - Tokenização de cartões
 - Autenticação de transações
+- Exclusão de cartões
 - Documentação automática (Swagger/OpenAPI)
 - Validação de dados de entrada
 - Sistema de logs para auditoria
@@ -55,28 +56,54 @@ uvicorn app.main:app --reload
 
 ### Testes Automatizados
 
-1. Certifique-se que a API está rodando (passo anterior)
+1. Certifique-se que a API está rodando:
+```bash
+# Em um terminal separado
+uvicorn app.main:app
+```
 
-2. Execute todos os testes:
+2. Em outro terminal, navegue até a pasta de testes:
 ```bash
 cd tests/robot
-robot -L TRACE .
 ```
 
-3. Execute testes específicos por tags:
+3. Execute os testes:
+
+a) Para executar todos os testes com log detalhado:
 ```bash
-# Executar apenas testes de emissão
-robot -L TRACE -i EmissaoCartao .
-
-# Executar apenas testes de tokenização
-robot -L TRACE -i Tokenizacao .
-
-# Executar apenas testes de autenticação
-robot -L TRACE -i Autenticacao .
-
-# Executar apenas testes de health check
-robot -L TRACE -i Health .
+robot -d results -L TRACE .
 ```
+
+b) Para executar testes específicos por tags:
+```bash
+# Testes de emissão de cartão
+robot -d results -L TRACE -i EmissaoCartao .
+
+# Testes de tokenização
+robot -d results -L TRACE -i Tokenizacao .
+
+# Testes de autenticação
+robot -d results -L TRACE -i Autenticacao .
+
+# Testes de health check
+robot -d results -L TRACE -i Health .
+
+# Testes de exclusão de cartão
+robot -d results -L TRACE -i ExclusaoCartao .
+```
+
+c) Para executar um arquivo específico:
+```bash
+# Exemplo: executar apenas os testes de autenticação
+robot -d results -L TRACE autenticacao_bdd.robot
+```
+
+Opções do comando robot:
+- `-d results`: Coloca relatórios na pasta 'results'
+- `-L TRACE`: Nível de log detalhado
+- `-i TAG`: Executa apenas testes com a tag especificada
+- `-v VARIAVEL:VALOR`: Define uma variável
+- `-t "Nome do Teste"`: Executa um teste específico pelo nome
 
 Os resultados dos testes serão gerados em:
 - `log.html`: Log detalhado da execução
@@ -102,6 +129,7 @@ HST_card_api/
 │       ├── emissao_cartao_bdd.robot       # Teste de emissão
 │       ├── health_bdd.robot               # Teste de health check
 │       ├── tokenizacao_bdd.robot          # Teste de tokenização
+│       ├── exclusao_cartao_bdd.robot     # Teste de exclusão
 │       └── requirements.txt               # Dependências dos testes
 │
 ├── docs/
@@ -140,6 +168,12 @@ curl -X POST "http://127.0.0.1:8000/transactions/authenticate" \
            "amount": 100.00,
            "merchant": "Loja Exemplo"
          }'
+```
+
+### 4. Excluir um Cartão
+
+```bash
+curl -X DELETE "http://127.0.0.1:8000/cards/{numero_do_cartao}"
 ```
 
 ## Ambiente de Desenvolvimento

@@ -61,5 +61,19 @@ class CardService:
         
         return True, "Transaction successful", transaction_id
 
+    def delete_card(self, card_number: str) -> bool:
+        """Delete a card and its associated token if it exists."""
+        if card_number not in self.cards:
+            return False
+            
+        # Remove any associated token
+        card = self.cards[card_number]
+        if hasattr(card, 'token') and card.token in self.tokens:
+            del self.tokens[card.token]
+            
+        # Remove the card
+        del self.cards[card_number]
+        return True
+
 # Create a global instance of CardService
 card_service = CardService()

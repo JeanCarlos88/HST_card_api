@@ -67,6 +67,19 @@ async def authenticate_transaction(transaction: TransactionRequest) -> Transacti
         transaction_id=transaction_id
     )
 
+@app.delete("/cards/{card_number}", tags=["cards"])
+async def delete_card(card_number: str):
+    """
+    Delete a card by its number.
+    """
+    logger.info(f"Deleting card: {card_number}")
+    if card_service.delete_card(card_number):
+        logger.info(f"Card deleted successfully: {card_number}")
+        return {"message": "Card deleted successfully"}
+    else:
+        logger.error(f"Card not found: {card_number}")
+        raise HTTPException(status_code=404, detail="Card not found")
+
 @app.get("/health", tags=["health"])
 async def health_check():
     """
