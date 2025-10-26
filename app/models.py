@@ -22,6 +22,17 @@ class CardBase(BaseModel):
 class CardCreate(CardBase):
     pass
 
+class CardUpdate(BaseModel):
+    holder_name: Optional[str] = Field(min_length=2, max_length=100, default=None)
+    expiry_date: Optional[date] = None
+
+    @field_validator('holder_name')
+    @classmethod
+    def name_length(cls, v):
+        if v is not None and not (2 <= len(v) <= 100):
+            raise ValueError('holder_name deve ter entre 2 e 100 caracteres')
+        return v
+
 class Card(CardBase):
     card_number: str
     cvv: str

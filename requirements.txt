@@ -2,3 +2,6 @@ fastapi
 uvicorn
 pydantic
 uuid
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart

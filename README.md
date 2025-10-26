@@ -9,6 +9,8 @@ Este projeto implementa uma API RESTful para simulação de um sistema de emiss�
 - Tokenização de cartões
 - Autenticação de transações
 - Exclusão de cartões
+- Edição de dados do cartão
+- Autenticação JWT para endpoints
 - Documentação automática (Swagger/OpenAPI)
 - Validação de dados de entrada
 - Sistema de logs para auditoria
@@ -20,6 +22,9 @@ Este projeto implementa uma API RESTful para simulação de um sistema de emiss�
 - Uvicorn
 - Pydantic
 - UUID
+- python-jose[cryptography]
+- passlib[bcrypt]
+- python-multipart
 
 ## Instalação
 
@@ -119,7 +124,8 @@ HST_card_api/
 │   ├── __init__.py
 │   ├── main.py          # Aplicação FastAPI e endpoints
 │   ├── models.py        # Modelos Pydantic
-│   └── services.py      # Lógica de negócios
+│   ├── services.py      # Lógica de negócios
+│   └── auth.py         # Autenticação JWT
 │
 ├── tests/
 │   └── robot/           # Testes automatizados com Robot Framework
@@ -140,10 +146,21 @@ HST_card_api/
 
 ## Exemplos de Uso
 
+### 0. Obter Token de Acesso (JWT)
+
+```bash
+curl -X POST "http://127.0.0.1:8000/token" \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "username=admin&password=adminpass"
+```
+
+Guarde o token recebido para usar nas próximas requisições.
+
 ### 1. Emitir um Novo Cartão
 
 ```bash
 curl -X POST "http://127.0.0.1:8000/cards/issue" \
+     -H "Authorization: Bearer {seu_token_jwt}" \
      -H "Content-Type: application/json" \
      -d '{
            "holder_name": "João Silva",
@@ -155,16 +172,18 @@ curl -X POST "http://127.0.0.1:8000/cards/issue" \
 ### 2. Tokenizar um Cartão
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/cards/{numero_do_cartao}/tokenize"
+curl -X POST "http://127.0.0.1:8000/cards/{numero_do_cartao}/tokenize" \
+     -H "Authorization: Bearer {seu_token_jwt}"
 ```
 
 ### 3. Autenticar uma Transação
 
 ```bash
 curl -X POST "http://127.0.0.1:8000/transactions/authenticate" \
+     -H "Authorization: Bearer {seu_token_jwt}" \
      -H "Content-Type: application/json" \
      -d '{
-           "token": "seu_token_aqui",
+           "token": "seu_token_cartao",
            "amount": 100.00,
            "merchant": "Loja Exemplo"
          }'
@@ -173,7 +192,20 @@ curl -X POST "http://127.0.0.1:8000/transactions/authenticate" \
 ### 4. Excluir um Cartão
 
 ```bash
-curl -X DELETE "http://127.0.0.1:8000/cards/{numero_do_cartao}"
+curl -X DELETE "http://127.0.0.1:8000/cards/{numero_do_cartao}" \
+     -H "Authorization: Bearer {seu_token_jwt}"
+```
+
+### 5. Atualizar Dados do Cartão
+
+```bash
+curl -X PATCH "http://127.0.0.1:8000/cards/{numero_do_cartao}" \
+     -H "Authorization: Bearer {seu_token_jwt}" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "holder_name": "Novo Nome",
+           "expiry_date": "2026-12-31"
+         }'
 ```
 
 ## Ambiente de Desenvolvimento
